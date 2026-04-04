@@ -1,0 +1,71 @@
+SEMAINE 1 : Data Engineering de Précision
+
+Objectif : Créer un moteur capable de nettoyer la télémétrie "sale" pour l'IA.
+
+Jours 1-4 : Le "F1 Data Cleaner"
+
+Appliquer : Utilise FastF1 pour charger une course complète. Crée un script qui supprime automatiquement les tours de sortie de stands, les tours sous drapeau jaune et les tours de rentrée.
+
+Challenge : Calcule le "Corrected Pace". C'est le temps au tour ajusté selon la charge de carburant qui diminue (une F1 s'allège d'environ 110kg, gagnant ~0.03s par tour).
+
+Lire : "Fuel corrected lap times in F1" pour comprendre le ratio poids/performance.
+
+Jours 5-7 : Le Profiler de Pneus
+
+Appliquer : Utilise Seaborn pour visualiser la dégradation. Ne trace pas juste le temps, trace le Delta de dégradation (Temps actuel - Meilleur temps du relais).
+
+Maths : Applique une régression polynomiale de degré 2 sur tes points pour trouver le "sommet" de la courbe de performance.
+
+🧠 SEMAINE 2 : Intelligence Prédictive (Le Cerveau)
+
+Objectif : Transformer tes stats en prédiction de futur.
+
+Jours 8-11 : Entraînement du Modèle "Pace Predictor"
+
+Appliquer : Utilise XGBoost (puisque tu connais Scikit-Learn). Tes features : Compound, TyreAge, AirTemp, TrackTemp, FuelLoad. Target : LapTime.
+
+Challenge : Ton modèle doit être capable de prédire le temps du tour 25 alors que le pilote est au tour 10.
+
+Lire : "Random Forests for F1 race strategy prediction".
+
+Jours 12-14 : Moteur de Monte Carlo en Python
+
+Appliquer : Crée une fonction qui lance 10 000 boucles. Pour chaque boucle, simule un arrêt au stand avec une variation aléatoire (utilisant numpy.random.normal).
+
+Résultat : Si dans 850 simulations sur 1000 le pilote ressort devant son rival, le dashboard affiche "Green Light".
+
+⚙️ SEMAINE 3 : Architecture Système & Backend
+
+Objectif : Faire parler ton Python à ton futur JS.
+
+Jours 15-18 : Logique de "Pit Window" & Trafic
+
+Appliquer : Coder l'algorithme qui projette la position GPS de toutes les voitures à $T + 20$ secondes.
+
+Challenge : Si la projection place ton pilote à moins de 1.5s (Dirty Air) d'une autre voiture, le modèle doit pénaliser la stratégie d'undercut de +0.5s par tour.
+
+Jours 19-21 : FastAPI & JSON Streaming
+
+Apprendre : FastAPI. C'est très simple si tu connais Python.
+
+Appliquer : Crée un endpoint qui renvoie un gros JSON contenant : le classement actuel, les pneus, et tes prédictions de stratégie calculées par ton modèle XGBoost.
+
+📊 SEMAINE 4 : Le Dashboard "Race Control" (JS & UI)
+
+Objectif : Visualisation Pro pour ton portfolio.
+
+Jours 22-25 : Structure JS & CSS (Tailwind)
+
+Appliquer : Puisque tu connais le JS Vanilla, utilise-le pour manipuler le DOM. Construis une interface "Dark Mode" ultra-pro.
+
+Challenge : Créer des composants de cartes pour chaque pilote qui clignotent en rouge quand l'IA suggère un arrêt ("BOX NOW").
+
+Jours 26-28 : Visualisation Dynamique (Charts)
+
+Apprendre/Appliquer : Utilise Chart.js ou ApexCharts (très simple en JS).
+
+Livrable : Le Race Trace. C'est un graphique d'écart relatif. Si la ligne descend, le pilote perd du temps. C'est ici qu'on voit l'effet de l'undercut visuellement.
+
+Jours 29-30 : Simulation Finale & Démo
+
+Action : Fais "tourner" une course historique (ex: GP de Monaco) en accéléré sur ton dashboard pour montrer comment tes prédictions évoluent tour après tour. avec ce module et en s'aidant de l'ia combien ca me prend en moyenne par jour

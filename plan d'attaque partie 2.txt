@@ -47,7 +47,7 @@ L'aspect "Monte Carlo" :
 Ajoute du bruit aléatoire (Incertitude). Simule 1000 fois la même stratégie avec des variations de +/- 0.2s sur les arrêts aux stands ou le rythme.
 
 Résultat :
-Tu obtiens une distribution de probabilité. Tu pourras dire : "La stratégie Medium-Hard a 85% de chances d'être 5 secondes plus rapide que la Soft-Hard."
+Tu obtiens une distribution de probabilité. Tu pourras dire : "La stratégie Medium Hard a 85% de chances d'être 5 secondes plus rapide que la Soft-Hard."
 
 ÉTAPE 4 : Validation "Réalité Terrain"
 Pour ta soutenance à l'INSAT, c'est ici que tu prouves que ton système est fiable.

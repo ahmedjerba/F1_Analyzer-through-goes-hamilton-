@@ -1,0 +1,74 @@
+🏎️ PARTIE 2 : INTELLIGENCE PRÉDICTIVE & STRATÉGIE
+ÉTAPE 1 : Création du Master Dataset (Le "Big Data" local)
+L'objectif est de passer d'un fichier de 30 lignes à un fichier de 20 000+ lignes.
+
+Modification de ta boucle de collecte : Au lieu de calculer et stocker les coefficients a,b,c, tu vas exporter chaque tour individuel qui a survécu à ton nettoyage (les inliers identifiés par RANSAC).
+
+Colonnes à inclure (Features) :
+
+Compound : (SOFT, MEDIUM, HARD) → à encoder numériquement.
+
+TyreLife : L'âge du pneu au moment du tour.
+
+TrackTemp : La température de la piste au moment du tour.
+
+FuelLoad : Charge estimée (ex: MaxLaps - CurrentLap).
+
+Abrasivity & LateralEnergy : Via ton dictionnaire Pirelli.
+
+La Cible (Target) :
+
+DeltaToBest : L'écart de temps dû uniquement à l'usure (ton Corrected Pace).
+
+ÉTAPE 2 : Entraînement du XGBoost Pace Predictor
+Ici, tu construis le "cerveau" qui prédit la perte de temps en temps réel.
+
+Preprocessing :
+
+Utilise un StandardScaler pour les variables numériques (température, charge).
+
+Utilise un OneHotEncoder pour les variables catégorielles (Type de gomme, Type de circuit).
+
+Le Modèle : Utilise XGBRegressor. C'est le standard en F1 car il gère parfaitement les relations non-linéaires, comme le "cliff" (chute brutale de performance) des pneus.
+
+Validation Croisée (LOCO) : Utilise une Leave-One-Circuit-Out Validation. Entraîne sur tous les circuits sauf un, et teste sur celui-là. C'est la seule façon de prouver que ton IA peut prédire un Grand Prix qu'elle n'a jamais "vu".
+
+ÉTAPE 3 : Le Simulateur Monte Carlo (Le Bloc B)
+C'est la partie "Stratégie" pure. Tu vas utiliser l'IA pour simuler des milliers de scénarios de course.
+
+L'Algorithme :
+
+Pour une course de 50 tours, tu simules différents scénarios (ex: Soft-Medium, Medium-Hard, Soft-Hard).
+
+Pour chaque tour, tu appelles ton modèle XGBoost pour savoir quel temps le pilote va faire selon l'usure prévue.
+
+L'aspect "Monte Carlo" :
+
+Ajoute du bruit aléatoire (Incertitude). Simule 1000 fois la même stratégie avec des variations de +/- 0.2s sur les arrêts aux stands ou le rythme.
+
+Résultat :
+Tu obtiens une distribution de probabilité. Tu pourras dire : "La stratégie Medium-Hard a 85% de chances d'être 5 secondes plus rapide que la Soft-Hard."
+
+ÉTAPE 4 : Validation "Réalité Terrain"
+Pour ta soutenance à l'INSAT, c'est ici que tu prouves que ton système est fiable.
+
+Le Test "Monza 2024" : Prends les données réelles de la course de Monza (que tu auras pris soin d'exclure de l'entraînement).
+
+Comparaison Visuelle : Superpose la courbe de dégradation prédite par ton XGBoost et la courbe réelle enregistrée par les capteurs de Leclerc ou Sainz.
+
+Métrique de Performance : Calcule la MAE (Mean Absolute Error). Si ton erreur est inférieure à 0.1s par tour, ton modèle est considéré comme exceptionnel.
+
+📦 Résumé des Livrables de la Partie 2 :
+Master Dataset : Un fichier CSV massif de 20 000+ tours qualifiés.
+
+Modèle XGBoost : Ton fichier .json ou .pkl prêt à être intégré au backend.
+
+Graphique de Validation : Une preuve visuelle (Prédiction vs Réalité).
+
+Script Monte Carlo : L'outil capable de comparer mathématiquement deux stratégies.
+
+Par quoi souhaites-tu commencer ?
+
+Modifier ton script de boucle pour générer le Master Dataset (20 000 lignes) ?
+
+Définir la structure Python de ton Simulateur Monte Carlo ?

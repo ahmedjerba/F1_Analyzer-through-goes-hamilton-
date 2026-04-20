@@ -133,52 +133,30 @@ def preprocess_data(df):
 
     # Encode season chronology from Bahrain 2023 to Abu Dhabi 2024.
     RACE_ORDER_2023_2024 = {
-        (2023, 'Bahrain Grand Prix'): 1,
-        (2023, 'Saudi Arabian Grand Prix'): 2,
-        (2023, 'Australian Grand Prix'): 3,
-        (2023, 'Azerbaijan Grand Prix'): 4,
-        (2023, 'Miami Grand Prix'): 5,
-        (2023, 'Monaco Grand Prix'): 6,
-        (2023, 'Spanish Grand Prix'): 7,
-        (2023, 'Canadian Grand Prix'): 8,
-        (2023, 'Austrian Grand Prix'): 9,
-        (2023, 'British Grand Prix'): 10,
-        (2023, 'Hungarian Grand Prix'): 11,
-        (2023, 'Belgian Grand Prix'): 12,
-        (2023, 'Dutch Grand Prix'): 13,
-        (2023, 'Italian Grand Prix'): 14,
-        (2023, 'Singapore Grand Prix'): 15,
-        (2023, 'Japanese Grand Prix'): 16,
-        (2023, 'Qatar Grand Prix'): 17,
-        (2023, 'United States Grand Prix'): 18,
-        (2023, 'Mexico City Grand Prix'): 19,
-        (2023, 'Sao Paulo Grand Prix'): 20,
-        (2023, 'Las Vegas Grand Prix'): 21,
-        (2023, 'Abu Dhabi Grand Prix'): 22,
-        (2024, 'Bahrain Grand Prix'): 23,
-        (2024, 'Saudi Arabian Grand Prix'): 24,
-        (2024, 'Australian Grand Prix'): 25,
-        (2024, 'Japanese Grand Prix'): 26,
-        (2024, 'Chinese Grand Prix'): 27,
-        (2024, 'Miami Grand Prix'): 28,
-        (2024, 'Emilia Romagna Grand Prix'): 29,
-        (2024, 'Monaco Grand Prix'): 30,
-        (2024, 'Canadian Grand Prix'): 31,
-        (2024, 'Spanish Grand Prix'): 32,
-        (2024, 'Austrian Grand Prix'): 33,
-        (2024, 'British Grand Prix'): 34,
-        (2024, 'Hungarian Grand Prix'): 35,
-        (2024, 'Belgian Grand Prix'): 36,
-        (2024, 'Dutch Grand Prix'): 37,
-        (2024, 'Italian Grand Prix'): 38,
-        (2024, 'Azerbaijan Grand Prix'): 39,
-        (2024, 'Singapore Grand Prix'): 40,
-        (2024, 'United States Grand Prix'): 41,
-        (2024, 'Mexico City Grand Prix'): 42,
-        (2024, 'Sao Paulo Grand Prix'): 43,
-        (2024, 'Las Vegas Grand Prix'): 44,
-        (2024, 'Qatar Grand Prix'): 45,
-        (2024, 'Abu Dhabi Grand Prix'): 46,
+        (2024, 'Bahrain Grand Prix'): 1,
+        (2024, 'Saudi Arabian Grand Prix'): 2,
+        (2024, 'Australian Grand Prix'): 3,
+        (2024, 'Japanese Grand Prix'): 4,
+        (2024, 'Chinese Grand Prix'): 5,
+        (2024, 'Miami Grand Prix'): 6,
+        (2024, 'Emilia Romagna Grand Prix'): 7,
+        (2024, 'Monaco Grand Prix'): 8,
+        (2024, 'Canadian Grand Prix'): 9,
+        (2024, 'Spanish Grand Prix'): 10,
+        (2024, 'Austrian Grand Prix'): 11,
+        (2024, 'British Grand Prix'): 12,
+        (2024, 'Hungarian Grand Prix'): 13,
+        (2024, 'Belgian Grand Prix'): 14,
+        (2024, 'Dutch Grand Prix'): 15,
+        (2024, 'Italian Grand Prix'): 16,
+        (2024, 'Azerbaijan Grand Prix'): 17,
+        (2024, 'Singapore Grand Prix'): 18,
+        (2024, 'United States Grand Prix'): 19,
+        (2024, 'Mexico City Grand Prix'): 20,
+        (2024, 'Sao Paulo Grand Prix'): 21,
+        (2024, 'Las Vegas Grand Prix'): 22,
+        (2024, 'Qatar Grand Prix'): 23,
+        (2024, 'Abu Dhabi Grand Prix'): 24,
     }
 
     if {'Year', 'Event'}.issubset(df.columns):
@@ -202,56 +180,81 @@ def preprocess_data(df):
         le_compound = LabelEncoder()
         df['CompoundEncoded'] = le_compound.fit_transform(df['CompoundExact'].astype(str))
 
-    # Driver -> Team mapping for 2023 + 2024 (year-aware first, then fallback by driver)
-    DRIVER_TEAM_BY_YEAR = {
-        (2023, 'VER'): 'Red Bull', (2023, 'PER'): 'Red Bull',
-        (2023, 'HAM'): 'Mercedes', (2023, 'RUS'): 'Mercedes',
-        (2023, 'LEC'): 'Ferrari', (2023, 'SAI'): 'Ferrari',
-        (2023, 'NOR'): 'McLaren', (2023, 'PIA'): 'McLaren',
-        (2023, 'ALO'): 'Aston Martin', (2023, 'STR'): 'Aston Martin',
-        (2023, 'OCO'): 'Alpine', (2023, 'GAS'): 'Alpine',
-        (2023, 'BOT'): 'Sauber', (2023, 'ZHO'): 'Sauber',
-        (2023, 'ALB'): 'Williams', (2023, 'SAR'): 'Williams',
-        (2023, 'MAG'): 'Haas', (2023, 'HUL'): 'Haas',
-        (2023, 'TSU'): 'RB', (2023, 'RIC'): 'RB',
-        (2023, 'DEV'): 'RB', (2023, 'LAW'): 'RB',
+    # Driver -> Team mapping for 2023 + 2024 (year-aware first, keyed by driver NUMBER)
+    DRIVER_CODE_TO_NUMBER = {
+        'VER': '1', 'PER': '11',
+        'HAM': '44', 'RUS': '63',
+        'LEC': '16', 'SAI': '55',
+        'NOR': '4', 'PIA': '81',
+        'ALO': '14', 'STR': '18',
+        'OCO': '31', 'GAS': '10',
+        'BOT': '77', 'ZHO': '24',
+        'ALB': '23', 'SAR': '2',
+        'MAG': '20', 'HUL': '27',
+        'TSU': '22', 'RIC': '3',
+        'DEV': '21', 'LAW': '40'
+    }
 
-        (2024, 'VER'): 'Red Bull', (2024, 'PER'): 'Red Bull',
-        (2024, 'HAM'): 'Mercedes', (2024, 'RUS'): 'Mercedes',
-        (2024, 'LEC'): 'Ferrari', (2024, 'SAI'): 'Ferrari',
-        (2024, 'NOR'): 'McLaren', (2024, 'PIA'): 'McLaren',
-        (2024, 'ALO'): 'Aston Martin', (2024, 'STR'): 'Aston Martin',
-        (2024, 'OCO'): 'Alpine', (2024, 'GAS'): 'Alpine',
-        (2024, 'BOT'): 'Sauber', (2024, 'ZHO'): 'Sauber',
-        (2024, 'ALB'): 'Williams', (2024, 'SAR'): 'Williams',
-        (2024, 'MAG'): 'Haas', (2024, 'HUL'): 'Haas',
-        (2024, 'TSU'): 'RB', (2024, 'RIC'): 'RB',
+    def normalize_driver_id(value):
+        if pd.isna(value):
+            return np.nan
+        text = str(value).strip().upper()
+        text = DRIVER_CODE_TO_NUMBER.get(text, text)
+        try:
+            return str(int(float(text)))
+        except ValueError:
+            return text
+
+    DRIVER_TEAM_BY_YEAR = {
+        (2023, '1'): 'Red Bull', (2023, '11'): 'Red Bull',
+        (2023, '44'): 'Mercedes', (2023, '63'): 'Mercedes',
+        (2023, '16'): 'Ferrari', (2023, '55'): 'Ferrari',
+        (2023, '4'): 'McLaren', (2023, '81'): 'McLaren',
+        (2023, '14'): 'Aston Martin', (2023, '18'): 'Aston Martin',
+        (2023, '31'): 'Alpine', (2023, '10'): 'Alpine',
+        (2023, '77'): 'Sauber', (2023, '24'): 'Sauber',
+        (2023, '23'): 'Williams', (2023, '2'): 'Williams',
+        (2023, '20'): 'Haas', (2023, '27'): 'Haas',
+        (2023, '22'): 'RB', (2023, '3'): 'RB',
+        (2023, '21'): 'RB', (2023, '40'): 'RB',
+
+        (2024, '1'): 'Red Bull', (2024, '11'): 'Red Bull',
+        (2024, '44'): 'Mercedes', (2024, '63'): 'Mercedes',
+        (2024, '16'): 'Ferrari', (2024, '55'): 'Ferrari',
+        (2024, '4'): 'McLaren', (2024, '81'): 'McLaren',
+        (2024, '14'): 'Aston Martin', (2024, '18'): 'Aston Martin',
+        (2024, '31'): 'Alpine', (2024, '10'): 'Alpine',
+        (2024, '77'): 'Sauber', (2024, '24'): 'Sauber',
+        (2024, '23'): 'Williams', (2024, '2'): 'Williams',
+        (2024, '20'): 'Haas', (2024, '27'): 'Haas',
+        (2024, '22'): 'RB', (2024, '3'): 'RB',
     }
     DRIVER_TO_TEAM_FALLBACK = {
-        'VER': 'Red Bull', 'PER': 'Red Bull',
-        'HAM': 'Mercedes', 'RUS': 'Mercedes',
-        'LEC': 'Ferrari', 'SAI': 'Ferrari',
-        'NOR': 'McLaren', 'PIA': 'McLaren',
-        'ALO': 'Aston Martin', 'STR': 'Aston Martin',
-        'OCO': 'Alpine', 'GAS': 'Alpine',
-        'BOT': 'Sauber', 'ZHO': 'Sauber',
-        'ALB': 'Williams', 'SAR': 'Williams',
-        'MAG': 'Haas', 'HUL': 'Haas',
-        'TSU': 'RB', 'RIC': 'RB', 'DEV': 'RB', 'LAW': 'RB'
+        '1': 'Red Bull', '11': 'Red Bull',
+        '44': 'Mercedes', '63': 'Mercedes',
+        '16': 'Ferrari', '55': 'Ferrari',
+        '4': 'McLaren', '81': 'McLaren',
+        '14': 'Aston Martin', '18': 'Aston Martin',
+        '31': 'Alpine', '10': 'Alpine',
+        '77': 'Sauber', '24': 'Sauber',
+        '23': 'Williams', '2': 'Williams',
+        '20': 'Haas', '27': 'Haas',
+        '22': 'RB', '3': 'RB', '21': 'RB', '40': 'RB'
     }
 
     if {'Year', 'Driver'}.issubset(df.columns):
         year_for_team = pd.to_numeric(df['Year'], errors='coerce').astype('Int64')
-        driver_for_team = df['Driver'].astype(str)
+        driver_for_team = df['Driver'].map(normalize_driver_id)
         team_keys = [
-            (int(y), d) if pd.notna(y) else None
+            (int(y), d) if pd.notna(y) and pd.notna(d) else None
             for y, d in zip(year_for_team, driver_for_team)
         ]
         team_series = pd.Series(team_keys, index=df.index).map(DRIVER_TEAM_BY_YEAR)
         team_fallback = driver_for_team.map(DRIVER_TO_TEAM_FALLBACK)
         df['Team'] = team_series.fillna(team_fallback).fillna('Unknown')
     elif 'Driver' in df.columns:
-        df['Team'] = df['Driver'].astype(str).map(DRIVER_TO_TEAM_FALLBACK).fillna('Unknown')
+        driver_for_team = df['Driver'].map(normalize_driver_id)
+        df['Team'] = driver_for_team.map(DRIVER_TO_TEAM_FALLBACK).fillna('Unknown')
 
     if 'Team' in df.columns:
         le_team = LabelEncoder()
@@ -315,8 +318,12 @@ def preprocess_data(df):
             df['stint_length'] = df.groupby(['RaceNumber', 'Stint'])['TyreLife'].transform('max')
         df['tyre_life_pct'] = df['TyreLife'] / df['stint_length']
 
-    # 6. Remove raw categorical columns after encoding
-    df = df.drop(columns=['Event', 'Driver', 'Compound', 'CompoundExact', 'Year', 'year', 'Team', 'YearEncoded'], errors='ignore')
+    # 6. Ensure TeamEncoded exists, then remove raw categorical columns after encoding.
+    if 'TeamEncoded' not in df.columns and 'Team' in df.columns:
+        le_team = LabelEncoder()
+        df['TeamEncoded'] = le_team.fit_transform(df['Team'].fillna('Unknown').astype(str))
+
+    df = df.drop(columns=['Event', 'Compound', 'CompoundExact', 'Year', 'year', 'Team', 'YearEncoded'], errors='ignore')
 
     return df
 
@@ -356,7 +363,7 @@ def _postprocess_features(df, verbose=False):
 def _get_model_features(df):
     """Retourne la liste exacte des colonnes pour le modèle."""
     # Liste corrigée avec virgules et ordre strict
-    features = [
+    features = ['Driver',
         'CompoundEncoded', 'TyreLife', 'TrackTemp', 'FuelLoad', 'Abrasivity',
         'LateralEnergy', 'DeltaToBest', 'LapNumber', 'Stint', 'RaceNumber',
         'TeamEncoded', 'delta_velocity', 'lateral_stress_cumul', 
@@ -435,5 +442,7 @@ def preprocess(df, verbose=False):
                 
     # On ne garde que les colonnes nécessaires dans l'ordre du modèle
     df_features = df_processed[feature_cols].copy()
+    if 'delta_next_lap' in df_processed.columns:
+        df_features['delta_next_lap'] = df_processed['delta_next_lap'].values
     
     return df_features

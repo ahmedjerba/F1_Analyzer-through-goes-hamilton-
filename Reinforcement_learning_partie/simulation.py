@@ -48,9 +48,9 @@ def simulate_one_scenario(init_state,model,test_action,test_lap,df_preprocessed,
     model_features = list(model.feature_names_in_)
     
     
-    current_rival_compound_str=get_compound_label_from_hardness_by_gp_code(state.RaceNumber, state.rival_compound_hardness)
+    current_rival_compound_str=get_compound_label_from_hardness_by_gp_code(state.race_number, state.rival_compound_hardness)
     current_rival_compound_int=state.rival_compound_hardness
-    rival_limit=state.estimate_length_limit(current_rival_compound_int)
+    rival_limit=state._estimate_stint_length(current_rival_compound_int)
     pit_loss=state.get_pit_loss()
     while state.lap<state.total_laps:
         action='STAY_OUT'
@@ -58,7 +58,7 @@ def simulate_one_scenario(init_state,model,test_action,test_lap,df_preprocessed,
             action=test_action
         rival_pitted_this_lap = False
         lap_context = df_preprocessed[
-            (df_preprocessed['RaceNumber'] == state.RaceNumber) & 
+            (df_preprocessed['RaceNumber'] == state.race_number) & 
             (df_preprocessed['LapNumber'] == state.lap)
         ]
         if not lap_context.empty:
@@ -78,37 +78,41 @@ def simulate_one_scenario(init_state,model,test_action,test_lap,df_preprocessed,
             
             if laps_remaining < 15:
                 current_rival_compound_str = 'SOFT'
-                if state.RaceNumber is not None:
-                    current_rival_compound_int = get_compound_hardness_by_gp_code(state.RaceNumber, 'SOFT')
+                if state.race_number is not None:
+                    current_rival_compound_int = get_compound_hardness_by_gp_code(state.race_number, 'SOFT')
                 else:
                     gp_name = state.gp_id or RACE_NUMBER_TO_GP_ID.get(state.race_number)
                     current_rival_compound_int = get_compound_hardness(gp_name, 'SOFT', current_rival_compound_int)
                 
             elif laps_remaining < 30:
                 current_rival_compound_str = 'MEDIUM'
-                if state.RaceNumber is not None:
-                    current_rival_compound_int = get_compound_hardness_by_gp_code(state.RaceNumber, 'MEDIUM')
+                if state.race_number is not None:
+                    current_rival_compound_int = get_compound_hardness_by_gp_code(state.race_number, 'MEDIUM')
                 else:
                     gp_name = state.gp_id or RACE_NUMBER_TO_GP_ID.get(state.race_number)
                     current_rival_compound_int = get_compound_hardness(gp_name, 'MEDIUM', current_rival_compound_int)
             else:
                 current_rival_compound_str = 'HARD'
-                if state.RaceNumber is not None:
-                    current_rival_compound_int = get_compound_hardness_by_gp_code(state.RaceNumber, 'HARD')
+                if state.race_number is not None:
+                    current_rival_compound_int = get_compound_hardness_by_gp_code(state.race_number, 'HARD')
                 else:
                     gp_name = state.gp_id or RACE_NUMBER_TO_GP_ID.get(state.race_number)
                     current_rival_compound_int = get_compound_hardness(gp_name, 'HARD', current_rival_compound_int)
             # --- MISE À JOUR DE LA LIMITE ---
             # On recalcule la limite pour le nouveau pneu choisi
-            rival_limit = state.estimate_length_limit(current_rival_compound_int)
+            rival_limit = state._estimate_stint_length(current_rival_compound_int)
             state.rival_tyre_life = 0
         current_noise = np.random.normal(0, noise_level)
         state = state.transition(action, model, noise=current_noise)
         if rival_pitted_this_lap:
-            current_rival_compound_str = get_compound_label_from_hardness_by_gp_code(state.RaceNumber, current_rival_compound_int)  
-            state.rival_compound_hardness = current_rival_compound_int
+            # Fallback securise si la durete cible n'est pas disponible.
+            new_h = getattr(state, 'new_rival_hardness', 3)
+            state.rival_compound_hardness = new_h if new_h is not None else 3
             state.rival_tyre_life = 0
-            state.time += pit_loss
+            current_rival_compound_str = get_compound_label_from_hardness_by_gp_code(state.race_number, current_rival_compound_int)  
+            state.rival_compound_hardness = current_rival_compound_int if current_rival_compound_int is not None else state.rival_compound_hardness
+            state.rival_tyre_life = 0
+            state.gap_to_rival += pit_loss
     return state.gap_to_rival
     
         

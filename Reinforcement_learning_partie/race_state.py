@@ -207,31 +207,29 @@ def get_compound_from_pit_action(action: str, default: Optional[str] = None) -> 
 
 
 def get_tyre_life_pct(race_number, gp_id, compound_label, tyre_life, stint_length=None, compound_hardness=None):
-    gp_name = gp_id or RACE_NUMBER_TO_GP_ID.get(race_number)
-    if gp_name is None:
-        fallback_limit = stint_length if stint_length and stint_length > 0 else 30.0
-        return float(tyre_life) / max(float(fallback_limit), 1.0)
-
-    gp_name = normalize_race_name_for_compound(gp_name)
-
+    # 1. Sécurité sur TyreLife (ne doit JAMAIS être None)
+    safe_tl = float(tyre_life) if tyre_life is not None else 0.0
+    
+    # 2. Mapping avec "MEDIUM" par défaut si on ne trouve rien
     if compound_label is None and compound_hardness is not None:
-        race_map = RACE_COMPOUND_TO_C.get(gp_name, {})
-        for label, c_code in race_map.items():
-            if C_HARDNESS.get(c_code) == int(compound_hardness):
-                compound_label = label.upper()
-                break
+        compound_label = get_compound_label_from_hardness_by_gp_code(race_number, compound_hardness)
+        if compound_label is None:
+            compound_label = "MEDIUM" # <-- Ton choix par défaut
 
-    if compound_label is not None:
-        compound_label = str(compound_label).strip().upper()
+    gp_name = gp_id or RACE_NUMBER_TO_GP_ID.get(race_number)
+    gp_name = normalize_race_name_for_compound(gp_name) if gp_name else None
 
-    tyre_limits = TYRE_LIMITS_2024.get(gp_name, {})
-    limit = tyre_limits.get(compound_label) if compound_label else None
+    # 3. Récupération de la limite avec triple sécurité
+    limit = None
+    if gp_name and compound_label:
+        tyre_limits = TYRE_LIMITS_2024.get(gp_name, {})
+        limit = tyre_limits.get(compound_label.upper())
 
     if limit is None:
-        limit = stint_length if stint_length and stint_length > 0 else 30.0
+        # Fallback ultime : stint_length ou 30 tours
+        limit = stint_length if (stint_length and stint_length > 0) else 30.0
 
-    return float(tyre_life) / max(float(limit), 1.0)
-
+    return safe_tl / max(float(limit), 1.0)
 
 @dataclass
 class RaceState:
@@ -336,26 +334,34 @@ class RaceState:
         }])
 
     def to_rival_features(self) -> pd.DataFrame:
-        tl = self.rival_tyre_life
+        # Valeurs par defaut robustes pour eviter les None dans les calculs.
+        tl = self.rival_tyre_life if self.rival_tyre_life is not None else 0.0
+        tt = self.track_temp if self.track_temp is not None else 30.0
+        ch = self.rival_compound_hardness if self.rival_compound_hardness is not None else 3.0
+        rf = self.rival_fuel_load if self.rival_fuel_load is not None else 50.0
+        ab = self.abrasivity if self.abrasivity is not None else 1.0
+        lat = self.lateral if self.lateral is not None else 1.0
+        rdb = self.rival_delta_to_best if self.rival_delta_to_best is not None else 0.0
+        rstint = self.rival_stint if self.rival_stint is not None else 1.0
         return pd.DataFrame([{
-            'CompoundEncoded': self.rival_compound_hardness,
-            'TyreLife': tl,
-            'TrackTemp': self.track_temp,
-            'FuelLoad': self.rival_fuel_load,
-            'Abrasivity': self.abrasivity,
-            'LateralEnergy': self.lateral,
-            'DeltaToBest': self.rival_delta_to_best,
+            'CompoundEncoded': float(ch),
+            'TyreLife': float(tl),
+            'TrackTemp': float(tt),
+            'FuelLoad': float(rf),
+            'Abrasivity': float(ab),
+            'LateralEnergy': float(lat),
+            'DeltaToBest': float(rdb),
             'LapNumber': self.lap,
-            'Stint': self.rival_stint,
+            'Stint': float(rstint),
             'RaceNumber': self.race_number,
             'TeamEncoded': self.team_encoded,
             'delta_velocity': 0.0,
-            'lateral_stress_cumul': self.lateral * tl,
-            'abrasive_stress_cumul': self.abrasivity * tl,
-            'stress_x_temp': self.lateral * self.track_temp * tl,
-            'compound_x_abrasivity': self.rival_compound_hardness * self.abrasivity,
-            'compound_x_lateral': self.rival_compound_hardness * self.lateral,
-            'compound_x_tyrelife': self.rival_compound_hardness * tl,
+            'lateral_stress_cumul': lat * tl,
+            'abrasive_stress_cumul': ab * tl,
+            'stress_x_temp': lat * tt * tl,
+            'compound_x_abrasivity': ch * ab,
+            'compound_x_lateral': ch * lat,
+            'compound_x_tyrelife': ch * tl,
             'prev_stint_max_delta': 0.0,
             'stint_length': self.stint_length,
             'tyre_life_pct': get_tyre_life_pct(
@@ -364,7 +370,7 @@ class RaceState:
                 None,
                 tl,
                 stint_length=self.stint_length,
-                compound_hardness=self.rival_compound_hardness,
+                compound_hardness=ch,
             ),
         }])
 
@@ -410,7 +416,7 @@ class RaceState:
 
     def _estimate_stint_length(self, compound: int) -> float:
         base_stint_map = {1: 48, 2: 45, 3: 38, 4: 28, 5: 20}
-        gp_id = self.gp_id or self.RACE_NUMBER_TO_GP_ID.get(self.race_number)
+        gp_id = self.gp_id or RACE_NUMBER_TO_GP_ID.get(self.race_number)
         gp_data = self.GP_STRATEGY_DATA.get(gp_id)
         if not gp_data:
             return base_stint_map.get(compound, 30)
@@ -420,7 +426,7 @@ class RaceState:
         return base_len * gp_data['wear_factor']
 
     def get_pit_loss(self) -> float:
-        gp_id = self.gp_id or self.RACE_NUMBER_TO_GP_ID.get(self.race_number)
+        gp_id = self.gp_id or RACE_NUMBER_TO_GP_ID.get(self.race_number)
         return self.GP_STRATEGY_DATA.get(gp_id, {}).get('pit_loss', 23.0)
 
     def transition(self, action: str, model, noise: float = 0.0) -> 'RaceState':
@@ -458,7 +464,7 @@ class RaceState:
         else:
             compound_str = get_compound_from_pit_action(action, default=new.compound)
             new.compound = compound_str
-            gp_name = self.gp_id or self.RACE_NUMBER_TO_GP_ID.get(self.race_number)
+            gp_name = self.gp_id or RACE_NUMBER_TO_GP_ID.get(self.race_number)
             new.compound_hardness = get_compound_hardness(gp_name, compound_str, self.compound_hardness)
             pit_time = np.random.normal(self.get_pit_loss(), Pit_Time_SIGMA)
             new.gap_to_rival -= pit_time

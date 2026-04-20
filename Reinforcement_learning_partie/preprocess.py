@@ -291,8 +291,7 @@ def preprocess_data(df):
 
     # 6. Feature engineering that still needs Driver/Event before they are dropped
     if 'RaceNumber' in df.columns:
-        df = df[df['RaceNumber'] != 6 ] 
-        df = df[df["RaceNumber"] != 30 ]  # Monaco = course 6,30
+        df = df[df['RaceNumber'] != 8 ]  # Monaco = course 8
 
     if {'CompoundEncoded', 'Abrasivity'}.issubset(df.columns):
         df['compound_x_abrasivity'] = df['CompoundEncoded'] * df['Abrasivity']

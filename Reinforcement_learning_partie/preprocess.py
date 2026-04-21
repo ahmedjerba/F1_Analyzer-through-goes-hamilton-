@@ -115,6 +115,13 @@ def preprocess_data(df):
         'C4': 'C4',
         'C5': 'C5',
     }
+    COMPOUND_TO_INT = {
+        'C1': 1,
+        'C2': 2,
+        'C3': 3,
+        'C4': 4,
+        'C5': 5,
+    }
 
     def normalize_event_label(value):
         if pd.isna(value):
@@ -177,8 +184,15 @@ def preprocess_data(df):
         ]
         df['CompoundExact'] = pd.Series(exact_compound, index=df.index)
         df['CompoundExact'] = df['CompoundExact'].fillna(base_compound)
-        le_compound = LabelEncoder()
-        df['CompoundEncoded'] = le_compound.fit_transform(df['CompoundExact'].astype(str))
+        # Encode compounds with deterministic F1 scale: C1 -> 1 ... C5 -> 5.
+        df['CompoundEncoded'] = (
+            df['CompoundExact']
+            .astype(str)
+            .str.upper()
+            .map(COMPOUND_TO_INT)
+            .fillna(0)
+            .astype(int)
+        )
 
     # Driver -> Team mapping for 2023 + 2024 (year-aware first, keyed by driver NUMBER)
     DRIVER_CODE_TO_NUMBER = {

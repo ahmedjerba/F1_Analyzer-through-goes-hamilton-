@@ -10,201 +10,186 @@ import pandas as pd
 Pit_Time_MU = 22.5
 Pit_Time_SIGMA = 0.8
 
-RACE_COMPOUND_TO_C = {
-    'Bahrain': {'Hard': 'C1', 'Medium': 'C2', 'Soft': 'C3'},
-    'Saudi Arabia': {'Hard': 'C2', 'Medium': 'C3', 'Soft': 'C4'},
-    'Australia': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Japan': {'Hard': 'C1', 'Medium': 'C2', 'Soft': 'C3'},
-    'China': {'Hard': 'C2', 'Medium': 'C3', 'Soft': 'C4'},
-    'Miami': {'Hard': 'C2', 'Medium': 'C3', 'Soft': 'C4'},
-    'Emilia-Romagna': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Monaco': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Canada': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Spain': {'Hard': 'C1', 'Medium': 'C2', 'Soft': 'C3'},
-    'Austria': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Great Britain': {'Hard': 'C1', 'Medium': 'C2', 'Soft': 'C3'},
-    'Hungary': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Belgium': {'Hard': 'C2', 'Medium': 'C3', 'Soft': 'C4'},
-    'Netherlands': {'Hard': 'C1', 'Medium': 'C2', 'Soft': 'C3'},
-    'Italy': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Azerbaijan': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Singapore': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'USA (Austin)': {'Hard': 'C2', 'Medium': 'C3', 'Soft': 'C4'},
-    'Mexico': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Brazil': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Las Vegas': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
-    'Qatar': {'Hard': 'C1', 'Medium': 'C2', 'Soft': 'C3'},
-    'Abu Dhabi': {'Hard': 'C3', 'Medium': 'C4', 'Soft': 'C5'},
+F1_SEASON_2024_CONFIG = {
+    'Bahrain': {
+        'code': 'BAH', 'round': 1, 
+        'compounds': {'Hard': 1, 'Medium': 2, 'Soft': 3},
+        'wear_factor': 0.85, 'pit_loss': 23.0,
+        'tyre_limits': {'Hard': 34, 'Medium': 24, 'Soft': 16}
+    },
+    'Saudi Arabia': {
+        'code': 'SAU', 'round': 2,
+        'compounds': {'Hard': 2, 'Medium': 3, 'Soft': 4},
+        'wear_factor': 1.10, 'pit_loss': 24.0,
+        'tyre_limits': {'Hard': 48, 'Medium': 34, 'Soft': 22}
+    },
+    'Australia': { # Remplacement de 'Melbourne'
+        'code': 'AUS', 'round': 3,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 1.05, 'pit_loss': 21.0,
+        'tyre_limits': {'Hard': 38, 'Medium': 26, 'Soft': 14}
+    },
+    'Japan': { # Remplacement de 'Suzuka'
+        'code': 'JPN', 'round': 4,
+        'compounds': {'Hard': 1, 'Medium': 2, 'Soft': 3},
+        'wear_factor': 0.80, 'pit_loss': 22.5,
+        'tyre_limits': {'Hard': 32, 'Medium': 22, 'Soft': 15}
+    },
+    'China': {
+        'code': 'CHN', 'round': 5,
+        'compounds': {'Hard': 2, 'Medium': 3, 'Soft': 4},
+        'wear_factor': 0.95, 'pit_loss': 25.5,
+        'tyre_limits': {'Hard': 35, 'Medium': 25, 'Soft': 17}
+    },
+    'Miami': {
+        'code': 'MIA', 'round': 6,
+        'compounds': {'Hard': 2, 'Medium': 3, 'Soft': 4},
+        'wear_factor': 1.15, 'pit_loss': 24.5,
+        'tyre_limits': {'Hard': 42, 'Medium': 28, 'Soft': 18}
+    },
+    'Emilia-Romagna': { # Remplacement de 'Imola'
+        'code': 'EMI', 'round': 7,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 1.00, 'pit_loss': 23.0,
+        'tyre_limits': {'Hard': 44, 'Medium': 30, 'Soft': 20}
+    },
+    'Monaco': {
+        'code': 'MON', 'round': 8,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 1.50, 'pit_loss': 25.0,
+        'tyre_limits': {'Hard': 60, 'Medium': 45, 'Soft': 30}
+    },
+    'Canada': {
+        'code': 'CAN', 'round': 9,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 1.25, 'pit_loss': 22.5,
+        'tyre_limits': {'Hard': 48, 'Medium': 32, 'Soft': 20}
+    },
+    'Spain': {
+        'code': 'ESP', 'round': 10,
+        'compounds': {'Hard': 1, 'Medium': 2, 'Soft': 3},
+        'wear_factor': 0.82, 'pit_loss': 23.0,
+        'tyre_limits': {'Hard': 34, 'Medium': 24, 'Soft': 16}
+    },
+    'Austria': {
+        'code': 'AUT', 'round': 11,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 0.88, 'pit_loss': 20.5,
+        'tyre_limits': {'Hard': 40, 'Medium': 28, 'Soft': 18}
+    },
+    'Great Britain': { # Remplacement de 'Silverstone'
+        'code': 'GBR', 'round': 12,
+        'compounds': {'Hard': 1, 'Medium': 2, 'Soft': 3},
+        'wear_factor': 0.75, 'pit_loss': 20.0,
+        'tyre_limits': {'Hard': 35, 'Medium': 25, 'Soft': 17}
+    },
+    'Hungary': {
+        'code': 'HUN', 'round': 13,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 0.92, 'pit_loss': 23.5,
+        'tyre_limits': {'Hard': 40, 'Medium': 28, 'Soft': 18}
+    },
+    'Belgium': { # Remplacement de 'Spa'
+        'code': 'BEL', 'round': 14,
+        'compounds': {'Hard': 2, 'Medium': 3, 'Soft': 4},
+        'wear_factor': 0.90, 'pit_loss': 23.5,
+        'tyre_limits': {'Hard': 30, 'Medium': 22, 'Soft': 14}
+    },
+    'Netherlands': { # Remplacement de 'Zandvoort'
+        'code': 'NED', 'round': 15,
+        'compounds': {'Hard': 1, 'Medium': 2, 'Soft': 3},
+        'wear_factor': 0.82, 'pit_loss': 18.0,
+        'tyre_limits': {'Hard': 42, 'Medium': 30, 'Soft': 20}
+    },
+    'Italy': { # Remplacement de 'Monza'
+        'code': 'ITA', 'round': 16,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 1.05, 'pit_loss': 24.0,
+        'tyre_limits': {'Hard': 40, 'Medium': 28, 'Soft': 18}
+    },
+    'Azerbaijan': { # Remplacement de 'Baku'
+        'code': 'AZE', 'round': 17,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 1.15, 'pit_loss': 26.0,
+        'tyre_limits': {'Hard': 42, 'Medium': 28, 'Soft': 18}
+    },
+    'Singapore': {
+        'code': 'SIN', 'round': 18,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 1.20, 'pit_loss': 28.5,
+        'tyre_limits': {'Hard': 42, 'Medium': 28, 'Soft': 18}
+    },
+    'USA': { # Remplacement de 'Austin'
+        'code': 'USA', 'round': 19,
+        'compounds': {'Hard': 2, 'Medium': 3, 'Soft': 4},
+        'wear_factor': 0.88, 'pit_loss': 24.0,
+        'tyre_limits': {'Hard': 36, 'Medium': 24, 'Soft': 16}
+    },
+    'Mexico': {
+        'code': 'MEX', 'round': 20,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 1.10, 'pit_loss': 24.5,
+        'tyre_limits': {'Hard': 50, 'Medium': 35, 'Soft': 22}
+    },
+    'Brazil': { # Remplacement de 'Interlagos'
+        'code': 'BRA', 'round': 21,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 0.95, 'pit_loss': 21.0,
+        'tyre_limits': {'Hard': 40, 'Medium': 28, 'Soft': 18}
+    },
+    'Las Vegas': {
+        'code': 'LVS', 'round': 22,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 1.35, 'pit_loss': 27.0,
+        'tyre_limits': {'Hard': 48, 'Medium': 32, 'Soft': 20}
+    },
+    'Qatar': {
+        'code': 'QAT', 'round': 23,
+        'compounds': {'Hard': 1, 'Medium': 2, 'Soft': 3},
+        'wear_factor': 0.70, 'pit_loss': 25.0,
+        'tyre_limits': {'Hard': 30, 'Medium': 22, 'Soft': 16}
+    },
+    'Abu Dhabi': {
+        'code': 'ABU', 'round': 24,
+        'compounds': {'Hard': 3, 'Medium': 4, 'Soft': 5},
+        'wear_factor': 1.10, 'pit_loss': 24.0,
+        'tyre_limits': {'Hard': 40, 'Medium': 28, 'Soft': 18}
+    }
 }
-
-GP_CODE_TO_RACE = {
-    'BAH': 'Bahrain',
-    'SAU': 'Saudi Arabia',
-    'AUS': 'Australia',
-    'JPN': 'Japan',
-    'CHN': 'China',
-    'MIA': 'Miami',
-    'EMI': 'Emilia-Romagna',
-    'MON': 'Monaco',
-    'CAN': 'Canada',
-    'ESP': 'Spain',
-    'AUT': 'Austria',
-    'GBR': 'Great Britain',
-    'HUN': 'Hungary',
-    'BEL': 'Belgium',
-    'NED': 'Netherlands',
-    'ITA': 'Italy',
-    'AZE': 'Azerbaijan',
-    'SIN': 'Singapore',
-    'USA': 'USA (Austin)',
-    'MEX': 'Mexico',
-    'BRA': 'Brazil',
-    'LVS': 'Las Vegas',
-    'QAT': 'Qatar',
-    'ABU': 'Abu Dhabi',
-}
-
-RACE_NAME_TO_COMPOUND_KEY = {
-    'Imola': 'Emilia-Romagna',
-    'Baku': 'Azerbaijan',
-    'Austin': 'USA (Austin)',
-    'Melbourne': 'Australia',
-}
-
-TYRE_LIMITS_2024 = {
-    'Bahrain': {'SOFT': 16, 'MEDIUM': 24, 'HARD': 34},
-    'Saudi Arabia': {'SOFT': 22, 'MEDIUM': 34, 'HARD': 48},
-    'Australia': {'SOFT': 14, 'MEDIUM': 26, 'HARD': 38},
-    'Japan': {'SOFT': 15, 'MEDIUM': 22, 'HARD': 32},
-    'China': {'SOFT': 17, 'MEDIUM': 25, 'HARD': 35},
-    'Miami': {'SOFT': 18, 'MEDIUM': 28, 'HARD': 42},
-    'Emilia-Romagna': {'SOFT': 20, 'MEDIUM': 30, 'HARD': 44},
-    'Monaco': {'SOFT': 30, 'MEDIUM': 45, 'HARD': 60},
-    'Canada': {'SOFT': 20, 'MEDIUM': 32, 'HARD': 48},
-    'Spain': {'SOFT': 16, 'MEDIUM': 24, 'HARD': 34},
-    'Austria': {'SOFT': 18, 'MEDIUM': 28, 'HARD': 40},
-    'Great Britain': {'SOFT': 17, 'MEDIUM': 25, 'HARD': 35},
-    'Hungary': {'SOFT': 18, 'MEDIUM': 28, 'HARD': 40},
-    'Belgium': {'SOFT': 14, 'MEDIUM': 22, 'HARD': 30},
-    'Netherlands': {'SOFT': 20, 'MEDIUM': 30, 'HARD': 42},
-    'Italy': {'SOFT': 18, 'MEDIUM': 28, 'HARD': 40},
-    'Azerbaijan': {'SOFT': 18, 'MEDIUM': 28, 'HARD': 42},
-    'Singapore': {'SOFT': 18, 'MEDIUM': 28, 'HARD': 42},
-    'USA (Austin)': {'SOFT': 16, 'MEDIUM': 24, 'HARD': 36},
-    'Mexico': {'SOFT': 22, 'MEDIUM': 35, 'HARD': 50},
-    'Brazil': {'SOFT': 18, 'MEDIUM': 28, 'HARD': 40},
-    'Las Vegas': {'SOFT': 20, 'MEDIUM': 32, 'HARD': 48},
-    'Qatar': {'SOFT': 16, 'MEDIUM': 22, 'HARD': 30},
-    'Abu Dhabi': {'SOFT': 18, 'MEDIUM': 28, 'HARD': 40},
-}
-
-RACE_NUMBER_TO_GP_ID = {
-    23: 'Bahrain',
-    24: 'Saudi Arabia',
-    25: 'Australia',
-    26: 'Suzuka',
-    27: 'China',
-    28: 'Miami',
-    29: 'Imola',
-    30: 'Monaco',
-    31: 'Canada',
-    32: 'Spain',
-    33: 'Austria',
-    34: 'Silverstone',
-    35: 'Hungary',
-    36: 'Spa',
-    37: 'Zandvoort',
-    38: 'Monza',
-    39: 'Baku',
-    40: 'Singapore',
-    41: 'Austin',
-    42: 'Mexico',
-    43: 'Interlagos',
-    44: 'Las Vegas',
-    45: 'Qatar',
-    46: 'Abu Dhabi',
-}
-
-C_HARDNESS = {'C1': 1, 'C2': 2, 'C3': 3, 'C4': 4, 'C5': 5}
-
-
-def normalize_race_name_for_compound(race_name: Optional[str]) -> Optional[str]:
-    if race_name is None:
-        return None
-    key = str(race_name).strip()
-    return RACE_NAME_TO_COMPOUND_KEY.get(key, key)
-
-
-def get_compound_hardness(race_name: str, compound: str, default: Optional[int] = None) -> Optional[int]:
-    if race_name is None or compound is None:
-        return default
-
-    normalized_race = normalize_race_name_for_compound(race_name)
-    race_map = RACE_COMPOUND_TO_C.get(normalized_race)
-    if race_map is None:
-        return default
-
-    c_compound = race_map.get(str(compound).strip().title())
-    if c_compound is None:
-        return default
-
-    return C_HARDNESS.get(c_compound, default)
-
-
-def get_compound_hardness_by_gp_code(gp_code: str, compound: str, default: Optional[int] = None) -> Optional[int]:
-    if gp_code is None:
-        return default
-
-    race_name = GP_CODE_TO_RACE.get(str(gp_code).strip().upper())
-    if race_name is None:
-        return default
-
-    return get_compound_hardness(race_name, compound, default)
-
-
-def get_compound_label_from_hardness(
-    race_name: str,
-    compound_hardness: int,
-    default: Optional[str] = None,
-) -> Optional[str]:
-    """Return Soft/Medium/Hard label from hardness (1..5) for a given GP."""
-    if race_name is None or compound_hardness is None:
-        return default
-
-    normalized_race = normalize_race_name_for_compound(race_name)
-    race_map = RACE_COMPOUND_TO_C.get(normalized_race)
-    if race_map is None:
-        return default
-
-    target_hardness = int(compound_hardness)
-    for label, c_code in race_map.items():
-        if C_HARDNESS.get(c_code) == target_hardness:
-            return str(label).upper()
-
-    return default
-
-
-def get_compound_label_from_hardness_by_gp_code(
-    gp_code: str,
-    compound_hardness: int,
-    default: Optional[str] = None,
-) -> Optional[str]:
-    if gp_code is None:
-        return default
-
-    race_name = GP_CODE_TO_RACE.get(str(gp_code).strip().upper())
-    if race_name is None:
-        return default
-
-    return get_compound_label_from_hardness(race_name, compound_hardness, default)
-
-
-def get_compound_from_pit_action(action: str, default: Optional[str] = None) -> Optional[str]:
-    """Convert PIT_* action string to compound label (SOFT/MEDIUM/HARD)."""
-    if action is None or not str(action).startswith('PIT_'):
-        return default
-    return str(action).split('_', 1)[1].strip().upper()
-
+def get_gp_param(gp_name, param_name, sub_param=None):
+    """
+    Récupère un paramètre spécifique pour un Grand Prix donné.
+    
+    Arguments:
+    - gp_name (str): Le nom du Grand Prix (ex: 'Bahrain', 'Japan').
+    - param_name (str): Le paramètre souhaité (ex: 'wear_factor', 'tyre_limits').
+    - sub_param (str, optionnel): La clé spécifique si le paramètre est un dictionnaire (ex: 'Soft').
+    
+    Retourne:
+    - La valeur du paramètre demandé, ou un message d'erreur si introuvable.
+    """
+    # 1. Vérification du Grand Prix
+    if gp_name not in F1_SEASON_2024_CONFIG:
+        raise KeyError(f"Le Grand Prix '{gp_name}' n'existe pas dans le calendrier.")
+        
+    gp_data = F1_SEASON_2024_CONFIG[gp_name]
+    
+    # 2. Vérification du paramètre principal
+    if param_name not in gp_data:
+        raise KeyError(f"Le paramètre '{param_name}' n'existe pas pour {gp_name}.")
+        
+    # 3. Gestion des paramètres imbriqués (ex: on veut juste la limite des pneus Soft)
+    if sub_param is not None:
+        if isinstance(gp_data[param_name], dict):
+            if sub_param in gp_data[param_name]:
+                return gp_data[param_name][sub_param]
+            else:
+                raise KeyError(f"Le sous-paramètre '{sub_param}' n'existe pas dans '{param_name}'.")
+        else:
+            raise ValueError(f"Le paramètre '{param_name}' n'est pas un dictionnaire, impossible d'utiliser sub_param.")
+            
+    # 4. Retour normal
+    return gp_data[param_name]
 
 def get_tyre_life_pct(race_number, gp_id, compound_label, tyre_life, stint_length=None, compound_hardness=None):
     # 1. Sécurité sur TyreLife (ne doit JAMAIS être None)
@@ -428,67 +413,3 @@ class RaceState:
     def get_pit_loss(self) -> float:
         gp_id = self.gp_id or RACE_NUMBER_TO_GP_ID.get(self.race_number)
         return self.GP_STRATEGY_DATA.get(gp_id, {}).get('pit_loss', 23.0)
-
-    def transition(self, action: str, model, noise: float = 0.0) -> 'RaceState':
-        new = deepcopy(self)
-        new.lap += 1
-        new.fuel_load -= 1
-        new.rival_fuel_load -= 1
-        rival_delta = model.predict(self.to_rival_features())[0]
-        rival_delta = max(0, rival_delta + np.random.normal(0, 0.1))
-
-        new.rival_delta_to_best = rival_delta
-        new.rival_tyre_life += 1
-
-        if action == 'STAY_OUT':
-            delta_pred = model.predict(self.to_features())[0]
-            delta_pred = max(0, delta_pred + noise)
-            prev_delta = new.delta_to_best
-            new.delta_to_best = delta_pred
-            new.delta_velocity = new.delta_to_best - prev_delta
-            new.tyre_life += 1
-            new.tyre_life_pct = get_tyre_life_pct(
-                new.race_number,
-                new.gp_id,
-                new.compound,
-                new.tyre_life,
-                stint_length=new.stint_length,
-                compound_hardness=new.compound_hardness,
-            )
-
-            new.lateral_stress_cumul = new.lateral * new.tyre_life
-            new.abrasive_stress_cumul = new.abrasivity * new.tyre_life
-            new.stress_x_temp = new.lateral * new.track_temp * new.tyre_life
-            new.compound_x_tyrelife = new.compound_hardness * new.tyre_life
-            new.gap_to_rival += (rival_delta - delta_pred)
-        else:
-            compound_str = get_compound_from_pit_action(action, default=new.compound)
-            new.compound = compound_str
-            gp_name = self.gp_id or RACE_NUMBER_TO_GP_ID.get(self.race_number)
-            new.compound_hardness = get_compound_hardness(gp_name, compound_str, self.compound_hardness)
-            pit_time = np.random.normal(self.get_pit_loss(), Pit_Time_SIGMA)
-            new.gap_to_rival -= pit_time
-
-            new.prev_stint_max_delta = new.delta_to_best
-            new.tyre_life = 1
-            new.delta_to_best = 0.0
-            new.delta_velocity = 0.0
-            new.stint_number += 1
-            new.stint_length = self._estimate_stint_length(new.compound_hardness)
-            new.tyre_life_pct = get_tyre_life_pct(
-                new.race_number,
-                new.gp_id,
-                new.compound,
-                new.tyre_life,
-                stint_length=new.stint_length,
-                compound_hardness=new.compound_hardness,
-            )
-
-            new.compound_x_abrasivity = new.compound_hardness * new.abrasivity
-            new.compound_x_lateral = new.compound_hardness * new.lateral
-            new.lateral_stress_cumul = new.lateral * new.tyre_life
-            new.abrasive_stress_cumul = new.abrasivity * new.tyre_life
-            new.stress_x_temp = new.lateral * new.track_temp * new.tyre_life
-            new.compound_x_tyrelife = new.compound_hardness * new.tyre_life
-
-        return new
